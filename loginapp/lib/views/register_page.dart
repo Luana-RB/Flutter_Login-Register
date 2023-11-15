@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:loginapp/models/user.dart';
 import 'package:loginapp/provider/user_provider.dart';
+import 'package:loginapp/views/login_page.dart';
 import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -27,14 +28,16 @@ class _RegisterPageState extends State<RegisterPage> {
 //Set Load Data
   @override
   void didChangeDependencies() {
-    final user = ModalRoute.of(context)?.settings.arguments as User;
-    _loadFormaData(user);
+    final user = ModalRoute.of(context)?.settings.arguments;
+    if (user != null && user is User) {
+      _loadFormaData(user);
+    }
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    const title = 'UserForm';
+    const title = 'Register';
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -52,7 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 final userProvider =
                     Provider.of<UsersProvider>(context, listen: false);
                 final existingUser =
-                    await userProvider.findById(_formData['id']!);
+                    await userProvider.findById(_formData['id'].toString());
 //Update user's data
                 if (existingUser.id != null) {
                   existingUser.setName = _formData['name']!;
@@ -62,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 } else {
 //if user doesn't exists yet, creat new user
                   final newUser = User(
-                    id: _formData['id']!,
+                    id: null,
                     name: _formData['name']!,
                     email: _formData['email']!,
                     password: _formData['password']!,
@@ -70,7 +73,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   userProvider.put(newUser);
                   userProvider.notifyListeners();
                 }
-                Navigator.of(context).pop();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()));
               }
             },
           ),

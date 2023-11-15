@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
             List<User> allUsers = snapshot.data!;
 
             return Scaffold(
-              backgroundColor: Theme.of(context).colorScheme.tertiary,
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
               body: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -68,16 +68,17 @@ class _LoginPageState extends State<LoginPage> {
                                     Theme.of(context).colorScheme.onTertiary),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10.0),
-                              child: const Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(15.0, 8.0, 15.0, 8.0),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    15.0, 8.0, 15.0, 8.0),
                                 child: Text(
-                                  'Emprestaí',
+                                  'Login',
                                   style: TextStyle(
                                     fontFamily: 'Ubuntu',
                                     fontWeight: FontWeight.bold,
                                     fontSize: 56,
-                                    color: Colors.pinkAccent,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                               ),
@@ -95,13 +96,13 @@ class _LoginPageState extends State<LoginPage> {
                                 controller: emailController,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return ('Usuário não válido');
+                                    return ('Invalid email');
                                   }
                                   if (allUsers
                                       .any((user) => user.email == value)) {
                                     return null;
                                   } else {
-                                    return ('Usuário não existe');
+                                    return ('Email does not exist');
                                   }
                                 },
                                 decoration: InputDecoration(
@@ -117,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-                              // Password Form
+// Password Form
                               TextFormField(
                                 style: TextStyle(
                                     color: Theme.of(context)
@@ -126,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                                 controller: passwordController,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return ('Senha não válida');
+                                    return ('Invalid password');
                                   }
 
                                   userLog = allUsers.firstWhere(
@@ -137,12 +138,12 @@ class _LoginPageState extends State<LoginPage> {
                                   if (userLog?.password == value) {
                                     return null;
                                   } else {
-                                    return 'Senha incorreta';
+                                    return 'Incorrect password';
                                   }
                                 },
                                 obscureText: true,
                                 decoration: InputDecoration(
-                                  labelText: 'Senha',
+                                  labelText: 'Password',
                                   labelStyle: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
