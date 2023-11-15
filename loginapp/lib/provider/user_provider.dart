@@ -59,7 +59,6 @@ class UsersProvider extends ChangeNotifier {
     List<User> allUsers = await getAll();
     return allUsers.firstWhere((user) => user.id == id,
         orElse: () => User(
-              id: '',
               name: '',
               email: '',
               password: '',

@@ -1,11 +1,11 @@
 class User {
-  String id;
+  String? id;
   String name;
   String email;
   String password;
 
   User({
-    required this.id,
+    this.id,
     required this.name,
     required this.email,
     required this.password,
@@ -26,5 +26,17 @@ class User {
       email: json['email'],
       password: json['password'],
     );
+  }
+
+  set setName(String newName) {
+    name = newName;
+  }
+
+  set setEmail(String newEmail) {
+    email = newEmail;
+  }
+
+  set setPassword(String newPassword) {
+    password = newPassword;
   }
 }

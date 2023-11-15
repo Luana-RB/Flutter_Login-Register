@@ -183,6 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                                   color: Theme.of(context).colorScheme.primary),
                             ),
                           ),
+//Register Button
                           ElevatedButton(
                             onPressed: () {
                               Navigator.push(
