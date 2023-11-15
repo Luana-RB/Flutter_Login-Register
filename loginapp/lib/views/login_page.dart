@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:loginapp/models/user.dart';
+import 'package:loginapp/provider/user_provider.dart';
 import 'package:loginapp/views/home_page.dart';
+import 'package:loginapp/views/register_page.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -27,132 +30,182 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.tertiary,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 20),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        color: Theme.of(context).colorScheme.onTertiary),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: const Padding(
-                        padding: EdgeInsets.fromLTRB(15.0, 8.0, 15.0, 8.0),
-                        child: Text(
-                          'Emprestaí',
-                          style: TextStyle(
-                            fontFamily: 'Ubuntu',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 56,
-                            color: Colors.pinkAccent,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 60),
-//Email Form
-                  Column(
-                    children: [
-                      TextFormField(
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary),
-                        controller: emailController,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return ('Usuário não válido');
-                          }
-                          if (dummyUsers.values
-                              .any((user) => user.email == value)) {
-                            return null;
-                          } else {
-                            return ('Usuário não existe');
-                          }
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          labelStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.primary),
-                          prefixIcon: Icon(Icons.person,
-                              color: Theme.of(context).colorScheme.secondary),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Password Form
-                      TextFormField(
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary),
-                        controller: passwordController,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return ('Senha não válida');
-                          }
+    return FutureBuilder<List<User>>(
+        future: Provider.of<UsersProvider>(context).getAll(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Scaffold(
+              body: Center(
+                child: Text('Erro: ${snapshot.error}'),
+              ),
+            );
+          } else {
+            List<User> allUsers = snapshot.data!;
 
-                          userLog = dummyUsers.values.firstWhere(
-                            (user) => user.email == emailController.text,
-                          );
-
-                          if (userLog?.password == value) {
-                            return null;
-                          } else {
-                            return 'Senha incorreta';
-                          }
-                        },
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Senha',
-                          labelStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.primary),
-                          prefixIcon: Icon(Icons.lock,
-                              color: Theme.of(context).colorScheme.secondary),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-//Login Button
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        userLog ??= dummyUsers.values.firstWhere(
-                          (user) => user.email == emailController.text,
-                        );
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MyHomePage(
-                              title: 'Login',
+            return Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.tertiary,
+              body: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 20),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15.0),
+                                color:
+                                    Theme.of(context).colorScheme.onTertiary),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: const Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(15.0, 8.0, 15.0, 8.0),
+                                child: Text(
+                                  'Emprestaí',
+                                  style: TextStyle(
+                                    fontFamily: 'Ubuntu',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 56,
+                                    color: Colors.pinkAccent,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        );
-                      }
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      await prefs.setBool('isLoggedIn', true);
-                    },
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: Theme.of(context).colorScheme.primary),
+                          const SizedBox(height: 60),
+//Email Form
+                          Column(
+                            children: [
+                              TextFormField(
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                controller: emailController,
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return ('Usuário não válido');
+                                  }
+                                  if (allUsers
+                                      .any((user) => user.email == value)) {
+                                    return null;
+                                  } else {
+                                    return ('Usuário não existe');
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Email',
+                                  labelStyle: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  prefixIcon: Icon(Icons.person,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              // Password Form
+                              TextFormField(
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                controller: passwordController,
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return ('Senha não válida');
+                                  }
+
+                                  userLog = allUsers.firstWhere(
+                                    (user) =>
+                                        user.email == emailController.text,
+                                  );
+
+                                  if (userLog?.password == value) {
+                                    return null;
+                                  } else {
+                                    return 'Senha incorreta';
+                                  }
+                                },
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Senha',
+                                  labelStyle: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  prefixIcon: Icon(Icons.lock,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 40),
+//Login Button
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                userLog ??= allUsers.firstWhere(
+                                  (user) => user.email == emailController.text,
+                                );
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const MyHomePage(
+                                      title: 'Login',
+                                    ),
+                                  ),
+                                );
+                              }
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.setBool('isLoggedIn', true);
+                            },
+                            child: Text(
+                              'Login',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const RegisterPage()));
+                            },
+                            child: Text(
+                              'Register',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+            );
+          }
+        });
   }
 }
